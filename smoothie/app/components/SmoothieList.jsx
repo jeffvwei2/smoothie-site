@@ -2,7 +2,7 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button'
 
-export default function SmoothieList({ smoothies, deleteSmoothie }) {
+export default function SmoothieList({ smoothies, deleteSmoothie, editSmoothie }) {
     return (
         <div>
             <h2>Available Smoothies</h2>
@@ -20,7 +20,7 @@ export default function SmoothieList({ smoothies, deleteSmoothie }) {
                                 ))}
                         </ListGroup>
                         <Card.Footer className='mx-auto'>
-                            <Button variant="secondary" onClick={() => {}}>Edit</Button>{' '}
+                            <Button variant="secondary" onClick={() => editSmoothie(smoothie)}>Edit</Button>{' '}
                             <Button variant="danger" onClick={() => deleteSmoothie(smoothie.id)}>Delete</Button>{' '}
                         </Card.Footer>
                     </Card>
