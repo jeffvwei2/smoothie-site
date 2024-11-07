@@ -11,7 +11,7 @@ import Button from 'react-bootstrap/Button'
 export default function ShowSmoothie() {
   const router = useRouter()
   const id = parseInt(useParams().id)
-  const { smoothies, handleDeleteSmoothie } = useContext(AppContext)
+  const { smoothies } = useContext(AppContext)
   const [smoothie, setSmoothie] = useState({ name: '', ingredients: [], id: '' })
 
   const fetchSmoothie = async () => {

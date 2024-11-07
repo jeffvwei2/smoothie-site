@@ -7,8 +7,9 @@ const PORT = process.env.PORT || 4000;
 
 // Connect to Redis
 const client = redis.createClient({
-    host: process.env.REDIS_HOST || 'localhost', 
-    port: process.env.REDIS_PORT || 6379,        
+    // host: process.env.REDIS_HOST || 'localhost', 
+    // port: process.env.REDIS_PORT || 6379,   
+    url: process.env.REDIS_URL || "redis://localhost:6379"    
 });
 client.connect()
 
@@ -17,7 +18,7 @@ client.on('error', (err) => {
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000', 
+  // origin: process.env.CLIENT_URL || 'http://localhost:3000', 
 }));
 app.use(express.json());
 

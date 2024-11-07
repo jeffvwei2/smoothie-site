@@ -5,7 +5,6 @@ import Row from 'react-bootstrap/Row'
 import SmoothieCard from './SmoothieCard'
 import { useContext } from 'react';
 import { AppContext } from './AppContext';
-import { useRouter } from 'next/navigation';
 
 export default function SmoothieList() {
     const { smoothies } = useContext(AppContext);
