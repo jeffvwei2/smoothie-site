@@ -1,4 +1,9 @@
 --------------------------------------------------------------------------------
+Deliverable URLs:
+
+- URL: https://radiant-brook-87453-de42ea427aed.herokuapp.com
+
+- Github: https://github.com/jeffvwei2/smoothie-site
 
 Higharc Frontend Engineer Challenge
 -----------------------------------
@@ -39,6 +44,7 @@ their own smoothie recipes.**
 
 -   **Deliverable**: A website and a corresponding Github repo are
     > available at a public URL
+    
 
 #### Advanced requirements (optional)
 
