@@ -8,10 +8,8 @@ export function AppProvider({ children }) {
   const [smoothies, setSmoothies] = useState([]);
   const [available, setAvailable] = useState([])
 
-  console.log('app context, smoo',smoothies)
   useEffect(() => {
     async function fetchSmoothies() {
-      console.log('fetch smoothies')
       try {
         const {data} =  await api.get('/smoothies')
         const mapped =  data.map((s) => JSON.parse(s))
@@ -25,7 +23,6 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     async function fetchAvailable() {
-      console.log('fetch available')
         try {
             const { data } = await api.get('/ingredients')
             setAvailable(data)

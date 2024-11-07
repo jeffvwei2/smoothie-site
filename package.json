@@ -4,9 +4,11 @@
   "scripts": {
     "build": "npm run build --prefix smoothie",
     "start": "npm run start-server",
-    "start-server": "node server/index.js"
+    "start-server": "node server/index.js",
+    "postinstall": "npm install --prefix smoothie && npm install --prefix server"
   },
   "engines": {
-    "node": "23.x"
+    "node": "23.x",
+    "npm": "10.9.0"
   }
 }

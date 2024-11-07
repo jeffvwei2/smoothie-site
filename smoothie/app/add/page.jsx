@@ -5,7 +5,6 @@ import SmoothieForm from '../../components/SmoothieForm'
 import api from "../../api";
 
 export default function AddSmoothie() {
-  console.log('add smoothie')
   const {smoothies, setSmoothies} = useContext(AppContext)
 
   const handleAddSmoothie = async (smoothie) => {

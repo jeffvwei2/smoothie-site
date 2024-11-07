@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import api from "../../../api";
 
 export default function EditSmoothie() {
-  console.log('edit smoothie')
   const router = useRouter()
   const id = parseInt(useParams().id)
   const { smoothies, setSmoothies } = useContext(AppContext)
