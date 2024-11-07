@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -11,6 +12,7 @@ export default function AddIngredient({ onSubmit, show, toggleShow }) {
     setIngredient(value)
   }
   const handleSubmit = (e) => {
+    e.preventDefault()
     if (ingredient.length < 1) {
       setValidated(true);
     } else {

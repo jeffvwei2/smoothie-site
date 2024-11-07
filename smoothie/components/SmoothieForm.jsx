@@ -1,20 +1,24 @@
-import { useState, useEffect } from 'react';
+'use client'
+import { useState, useEffect, useContext } from 'react';
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form'
 import AddIngredient from './AddIngredient'
+import { useRouter } from 'next/navigation';
+import { AppContext } from './AppContext'
+import api from '../api';
 
-const initialList = ['Blueberries', 'Soy Milk', 'Strawberry', 'Ginger', 'Carrot', 'Nut Cheese']
-
-export default function SmoothieForm({ smoothie, onSubmit, names }) {
+export default function SmoothieForm({ smoothie, onSubmit }) {
+    const router = useRouter()
     const [name, setName] = useState(smoothie ? smoothie.name : '');
     const [ingredients, setIngredients] = useState(
         smoothie ? smoothie.ingredients : [{ name: '', quantity: '' }]
     );
-    const [custom, setCustom] = useState([])
     const [show, setShow] = useState(false)
     const [validated, setValidated] = useState(false)
+    const [names, setNames] = useState([])
+    const { smoothies,available ,setAvailable} = useContext(AppContext)
     const [unique, setUnique] = useState(true)
 
     // set to edit mode
@@ -25,17 +29,9 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
         }
     }, [smoothie]);
 
-    // check if there are additional ingredients
     useEffect(() => {
-        if (!custom.length) {
-            const storage = localStorage.getItem('customIngredients')
-            if (storage) {
-                setCustom(JSON.parse(localStorage.getItem('customIngredients')))
-            }
-        } else {
-            localStorage.setItem('customIngredients', JSON.stringify(custom))
-        }
-    }, [custom])
+        setNames(smoothies.map((s) => s.name))
+    }, [smoothies])
 
     const handleIngredientChange = (index, field, value) => {
         const updatedIngredients = ingredients.map((ingredient, i) => {
@@ -49,21 +45,18 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
         setIngredients([...ingredients, { name: '', quantity: '' }]);
     };
 
-    const isUniqueName = (name) => {
-        // existing smoothie's own name
-        if (smoothie) {
-            return smoothie.name === name
+    const isNameTaken = (name) => {
+        if (names.includes(name)) {
+            const isUnique = smoothie && smoothie.name === name
+            setUnique(isUnique)
+            return isUnique
         }
-        //
-        return names.includes(name)
+        return true
     }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!isUniqueName(name.trim())) {
-            setUnique(false)
-        }
-        if (!e.target.checkValidity()) {
+        if (!isNameTaken(name.trim()) || !e.target.checkValidity()) {
             setValidated(true)
         } else {
             const smoothieData = {
@@ -72,10 +65,7 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
                 ingredients,
             };
             onSubmit(smoothieData);
-            setName('')
-            setIngredients([{ name: '', quantity: '' }])
-            setValidated(false)
-            setUnique(true)
+            router.push('/')
         }
     };
 
@@ -86,12 +76,28 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
         }
     }
 
-    const handleCreateIngredient = (value) => {
-        setCustom([...custom, value])
+    const handleCreateIngredient = async (ingredient) => {
+        setAvailable([...available, ingredient])
+        try {
+            await api.post('/ingredients', { ingredient })
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const toggleShow = () => {
         setShow(!show)
+    }
+
+    const clearForm = () => {
+        setName('')
+        setIngredients([{ name: '', quantity: '' }])
+        setValidated(false)
+        setUnique(true)
+    }
+
+    const handleNavigate = () => {
+        router.push('/')
     }
 
     return (
@@ -99,21 +105,30 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
             <Form onSubmit={handleSubmit} validated={validated} noValidate>
                 <AddIngredient onSubmit={handleCreateIngredient} show={show} toggleShow={toggleShow}></AddIngredient>
                 <h3>{smoothie ? 'Edit' : 'Create'} Smoothie</h3>
+                <Row className='mx-auto'>
+                    <Col>
+                        <Button variant="secondary" onClick={handleNavigate} className='ms-4'>Back</Button>
+                        <Button variant="primary" onClick={toggleShow} className='ms-4'>Create New Ingredient</Button>
+                    </Col>
+                </Row>
                 <Form.Group controlId="name" key="name">
-                    <Form.Label>Name:</Form.Label>
-                    <Form.Control type="text" placeholder="My Smoothie" value={name} onChange={(e) => setName(e.target.value)} required />
-                    {!unique && <Form.Text className=" text-danger">
-                        Name is already taken
-                    </Form.Text>}
-                    <Form.Control.Feedback type="invalid">
-                        Please provide a name
-                    </Form.Control.Feedback>
+                    <Row >
+                        <Col sm={8}>
+                            <Form.Label>Name:</Form.Label>
+                            <Form.Control type="text" placeholder="My Smoothie" value={name} onChange={(e) => setName(e.target.value)} required />
+                            {!unique && <Form.Text className="text-danger">
+                                Name is already taken
+                            </Form.Text>}
+                            <Form.Control.Feedback type="invalid">
+                                Please provide a name
+                            </Form.Control.Feedback>
+                        </Col>
+                    </Row>
                 </Form.Group>
                 <Form.Label className='mt-2'>
                     Ingredients:
-                    <Button size="sm" variant="outline-primary" onClick={toggleShow} className='ms-4'>Create New Ingredient</Button>
                 </Form.Label>
-                {ingredients.map((ingredient, index) => (
+                {ingredients.length && ingredients.map((ingredient, index) => (
                     <Form.Group controlId="ingredient" key={index}>
                         <Row className='mb-2'>
                             <Col>
@@ -123,7 +138,7 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
                                     onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
                                     required>
                                     <option value=''>Select an ingredient</option>
-                                    {[...initialList, ...custom].map((a, i) => (
+                                    {available.length && available.map((a, i) => (
                                         <option key={i} value={a}>{a}</option>
                                     ))}
                                 </Form.Select>
@@ -145,9 +160,9 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
                                 </Form.Control.Feedback>
                             </Col>
                             <Col>
-                                <Button variant="danger" onClick={() => handleDeleteIngredient(index)}>
+                                {!!index && <Button variant="danger" onClick={() => handleDeleteIngredient(index)}>
                                     X
-                                </Button>
+                                </Button>}
                             </Col>
                         </Row>
                     </Form.Group>
@@ -155,7 +170,7 @@ export default function SmoothieForm({ smoothie, onSubmit, names }) {
                 <Row className='mx-auto'>
                     <Col>
                         <Button variant="primary" onClick={handleAddIngredient}>Add Ingredient</Button>{' '}
-
+                        <Button variant="secondary" onClick={clearForm}>Clear Form</Button>{' '}
                         <Button variant="primary" type="submit">Save Smoothie</Button>
                     </Col>
                 </Row>

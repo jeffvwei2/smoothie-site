@@ -1,83 +1,49 @@
 'use client'
-import { useEffect, useState } from 'react';
-import SmoothieList from './components/SmoothieList';
-// import { PlusIcon } from '../icons/PlusIcon'
-import SmoothieForm from './components/SmoothieForm';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Container from 'react-bootstrap/Container'
+import SmoothieList from '../components/SmoothieList';
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import api from '../api';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-    const [smoothies, setSmoothies] = useState([]);
-    const [names, setNames] = useState([])
-    const [editing, setEditing] = useState()
-    
-    useEffect(() => {
-        if (!smoothies.length) {
-            const storage = localStorage.getItem('smoothies')
-            if(storage) {
-                setSmoothies(JSON.parse(localStorage.getItem('smoothies')))
-                setNames(smoothies.map((smoothie) => smoothie.name))
-            } 
-        } else {
-            localStorage.setItem('smoothies',JSON.stringify(smoothies))
-            setNames(smoothies.map((smoothie) => smoothie.name))
-        }
-    },[smoothies])
+  const router = useRouter()
 
-    const handleDeleteSmoothie = (id) => {
-        setSmoothies(smoothies.filter((smoothie) => smoothie.id !== id));
-    };
+  const handleNavigate = () => {
+    router.push('/add')
+  }
 
-    const handleUpdateSmoothies = (smoothie) => {
-        if (editing && smoothie.id === editing.id){
-            const updatedSmoothies = smoothies.map((s) => {
-                return smoothie.id == s.id ? smoothie : s
-            })
-            setSmoothies(updatedSmoothies)
-        } else {
-            setSmoothies([...smoothies,smoothie])
-        }
-        setEditing()
+  const clearData = () => {
+    try {
+      api.delete('/clearall')
+      window.location.reload();
+    } catch (err) {
+      console.log(err)
     }
+  }
 
-    const handleEdit = (smoothie) => {
-        setEditing(smoothie)
-    }
-    const clearCache = () => {
-        localStorage.removeItem('smoothies')
-        localStorage.removeItem('customIngredients')
-        window.location.reload()
-    }
-
-    return (
-        <Container>
-            <header>
-                <nav>
-                    <h1>
-                    <Row>
-                    <Col>
-                        Smoothie Maker
-                    </Col>
-                    <Col sm={1}>
-                        <Button variant="light" onClick={() => clearCache()} className='text-white' size='sm'>Clear Cache</Button>
-                    </Col>
-                    </Row>
-                    </h1>
-                </nav>
-            </header>
-            <div>
-                <main className='row'>
-                    <div className="col-4">
-                        <SmoothieList smoothies={smoothies} deleteSmoothie={handleDeleteSmoothie} editSmoothie={handleEdit}/>
-                    </div>
-                    <div className="col">
-                        <SmoothieForm onSubmit={handleUpdateSmoothies} names={names} smoothie={editing}/>
-                    </div>
-                </main>
-            </div>
-        </Container>
-    );
+  return (
+    <div>
+      <header>
+        <h1>
+          <Row>
+            <Col>
+              Smoothie Maker
+            </Col>
+            <Col sm={1}>
+              <Button variant="light" onClick={() => clearData()} className='text-white' size='sm'>Clear Data</Button>
+            </Col>
+          </Row>
+        </h1>
+      </header>
+      <Row>
+        <Col sm={8}>
+          <Button variant='primary' onClick={handleNavigate}>Create New Smoothie</Button>
+        </Col>
+      </Row>
+      <div>
+        <SmoothieList />
+      </div>
+    </div>
+  );
 }

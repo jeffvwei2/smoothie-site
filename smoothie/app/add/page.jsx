@@ -1,19 +1,22 @@
-'use client';
-import { useState } from 'react';
-import SmoothieForm from '@/components/SmoothieForm';
+'use client'
+import { useContext } from "react";
+import { AppContext } from '../../components/AppContext'
+import SmoothieForm from '../../components/SmoothieForm'
+import api from "../../api";
 
-export default function CreateSmoothiePage() {
-    const [smoothies, setSmoothies] = useState([]);
-    console.log(smoothies)
-    const addSmoothie = (smoothie) => {
-        setSmoothies([...smoothies, smoothie]);
-        console.log(smoothies)
-    };
+export default function AddSmoothie() {
+  console.log('add smoothie')
+  const {smoothies, setSmoothies} = useContext(AppContext)
 
-    return (
-        <div>
-            <h2>Create a New Smoothie</h2>
-            <SmoothieForm onSubmit={addSmoothie} />
-        </div>
-    );
+  const handleAddSmoothie = async (smoothie) => {
+    setSmoothies([...smoothies, smoothie])
+    try {
+      await api.post('/smoothies', {smoothie})
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  return(
+    <SmoothieForm onSubmit={handleAddSmoothie} smoothie={null} />
+  )
 }

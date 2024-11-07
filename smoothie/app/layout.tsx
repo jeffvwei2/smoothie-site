@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Container from "react-bootstrap/Container";
+import  {AppProvider} from '../components/AppContext'
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -11,11 +14,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('root layout')
   return (
     <html lang="en">
-      <body
-      >
-        {children}
+      <body>
+        <Container>
+          <AppProvider>
+            {children}
+          </AppProvider>
+        </Container>
       </body>
     </html>
   );
